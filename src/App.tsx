@@ -4,16 +4,19 @@ import type { AuthContext } from './types/auth';
 
 type AppProps = { auth?: AuthContext };
 
-const App = ({ auth = mockAuth }: AppProps) => {
+const App = ({ auth }: AppProps) => {
+  const isStandalone = auth === undefined;
+  const currentAuth = auth ?? mockAuth;
+
   return (
-  <div>
+  <div data-auth-mode={isStandalone ? 'standalone' : 'shell'}>
       <h1>Microfrontend de Reservas</h1>
 
       <p>
         Este componente pertenece al módulo remoto Reservas.
       </p>
 
-      <p>Usuario actual: {auth.user.name}</p>
+      <p>Usuario actual: {currentAuth.user.name}</p>
 
       <button>
         Nueva reserva
