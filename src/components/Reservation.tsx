@@ -22,8 +22,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
-import { courtService } from '../services/courtService';
-import { reservationService } from '../services/reservationService';
+import { useServices } from '../services/ServicesContext';
 import type { CourtData } from '../types/court';
 import type { ReservationData, ReservationSaveData } from '../types/reservation';
 import type { ScheduleData } from '../types/schedule';
@@ -90,6 +89,7 @@ const getAvailableSlots = (
 
 // TODO: VERIFICAR ENVIAR EL TOKEN DEL USUARIO EN LUGAR DE ID
 export const Reservation = ({ userId = 1 }: ReservationProps) => {
+  const { courtService, reservationService } = useServices();
 
   const today = useMemo(() => toLocalDate(new Date()), []);
   const [selectedDate, setSelectedDate] = useState('');
@@ -137,7 +137,7 @@ export const Reservation = ({ userId = 1 }: ReservationProps) => {
     return () => {
       isCurrentRequest = false;
     };
-  }, [selectedDate]);
+  }, [courtService, reservationService, selectedDate]);
 
   const availableCourts = useMemo<AvailableCourt[]>(() => {
     return courts.flatMap((court) => {
