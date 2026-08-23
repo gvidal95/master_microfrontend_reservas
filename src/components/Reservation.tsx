@@ -29,7 +29,7 @@ import type { ReservationData } from '../types/reservation';
 import type { ScheduleData } from '../types/schedule';
 
 type ReservationProps = {
-  userId?: number;
+  userId: number;
 };
 
 type TimeSlot = {
@@ -88,8 +88,7 @@ const getAvailableSlots = (
   return slots;
 };
 
-// TODO: VERIFICAR ENVIAR EL TOKEN DEL USUARIO EN LUGAR DE ID
-export const Reservation = ({ userId = 1 }: ReservationProps) => {
+export const Reservation = ({ userId }: ReservationProps) => {
   const { courtService, reservationService } = useServices();
 
   const today = useMemo(() => toLocalDate(new Date()), []);
@@ -167,7 +166,6 @@ export const Reservation = ({ userId = 1 }: ReservationProps) => {
       reservationUserId: userId,
     };
 
-    console.log({ reservation });
     setIsSaving(true);
     setError('');
 

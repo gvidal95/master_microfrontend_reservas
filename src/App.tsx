@@ -1,5 +1,5 @@
 import './App.css';
-import { Box, Paper, Typography } from '@mui/material';
+import { Alert, Box, Paper, Typography } from '@mui/material';
 import { Reservation } from './components/Reservation';
 import { mockAuth } from './data/mockAuth';
 import type { AuthContext } from './types/auth';
@@ -8,10 +8,11 @@ import { ServicesProvider } from './services/ServicesContext';
 type AppProps = { auth?: AuthContext };
 
 const App = ({ auth }: AppProps) => {
+  
   const isStandalone = auth === undefined;
   const currentAuth = auth ?? mockAuth;
   const parsedUserId = Number(currentAuth.user.id);
-  const reservationUserId = Number.isFinite(parsedUserId) ? parsedUserId : 1;
+  const hasValidUserId = Number.isSafeInteger(parsedUserId) && parsedUserId > 0;
 
   return (
     <ServicesProvider token={currentAuth.token}>
@@ -26,7 +27,13 @@ const App = ({ auth }: AppProps) => {
             Sesión activa: {currentAuth.user.name} ({currentAuth.user.email})
           </Typography>
         </Box>
-        <Reservation userId={reservationUserId} />
+        {hasValidUserId ? (
+          <Reservation userId={parsedUserId} />
+        ) : (
+          <Alert severity="error" sx={{ maxWidth: 1180, mx: 'auto', mt: 3 }}>
+            No se puede crear una reserva porque la sesión no contiene un ID de usuario válido.
+          </Alert>
+        )}
       </Paper>
     </ServicesProvider>
   );
