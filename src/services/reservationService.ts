@@ -1,23 +1,24 @@
-import { mockReservations } from '../data/reservation';
-import type { ReservationData, ReservationSaveData } from '../types/reservation';
+import { mockReservations, type reservationDataSave } from '../data/reservation';
+import type { ReservationData } from '../types/reservation';
+import { createApiClient } from './apiClient';
 
 /** Servicio de reservas con almacenamiento mock y una interfaz compatible con HTTP. */
-export const reservationService = {
-  /** Obtiene las reservas activas que bloquean horarios en una fecha. */
-  getOccupiedReservationsByDate: async (date: string): Promise<ReservationData[]> => {
-    return mockReservations.filter((reservation) =>
-      reservation.reservation_date === date && reservation.reservation_state === 'ACTIVO');
-  },
+export const createReservationService = (token: string) => {
+  const reservationApi = createApiClient('http://localhost:8083/reservations/api/', token);
 
-  /** Crea una reserva en el almacén mock. En el futuro delegará en POST /reservations. */
-  saveReservation: async (reservation: ReservationSaveData): Promise<ReservationData> => {
-    const savedReservation: ReservationData = {
-      ...reservation,
-      reservation_id: mockReservations.reduce(
-        (highestId, current) => Math.max(highestId, current.reservation_id), 0) + 1,
-    };
+  return {
+    /** Obtiene las reservas activas que bloquean horarios en una fecha. */
+    getOccupiedReservationsByDate: async (date: string): Promise<ReservationData[]> => {
+      return mockReservations.filter((reservation) =>
+        reservation.reservationDate === date && reservation.reservationState === 'ACTIVO');
+    },
 
-    mockReservations.push(savedReservation);
-    return savedReservation;
-  },
+    /** Guarda una reserva mediante el API de reservaciones. */
+    saveReservation: async (reservation: typeof reservationDataSave): Promise<ReservationData> => {
+      const { data } = await reservationApi.post<ReservationData>('reservations', reservation);
+      return data;
+    },
+  };
 };
+
+export type ReservationService = ReturnType<typeof createReservationService>;

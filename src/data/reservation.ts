@@ -1,14 +1,22 @@
-import type { ReservationData } from '../types/reservation';
+import type { ReservationData, ReservationSaveData } from '../types/reservation';
 
 /** Ejemplo del modelo utilizado por una reserva. */
 export const reservationData: ReservationData = {
-  reservation_id: 1,
-  reservation_date: '2026-08-24',
-  reservation_start_time: '17:00:00',
-  reservation_end_time: '18:00:00',
-  reservation_court_id: 1,
-  reservation_user_id: 1,
-  reservation_state: 'ACTIVO',
+  reservationId: 1,
+  reservationDate: '2026-08-24',
+  reservationStartTime: '17:00:00',
+  reservationEndTime: '18:00:00',
+  reservationCourtId: 1,
+  reservationUserId: 1,
+  reservationState: 'ACTIVO',
+};
+
+export const reservationDataSave: ReservationSaveData = {
+  reservationDate: '2026-08-24',
+  reservationStartTime: '17:00:00',
+  reservationEndTime: '18:00:00',
+  reservationCourtId: 1,
+  reservationUserId: 1,
 };
 
 /**

@@ -22,9 +22,10 @@ import {
   Typography,
 } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
+import type { reservationDataSave } from '../data/reservation';
 import { useServices } from '../services/ServicesContext';
 import type { CourtData } from '../types/court';
-import type { ReservationData, ReservationSaveData } from '../types/reservation';
+import type { ReservationData } from '../types/reservation';
 import type { ScheduleData } from '../types/schedule';
 
 type ReservationProps = {
@@ -66,9 +67,9 @@ const overlapsReservation = (
   courtId: number,
   reservations: ReservationData[],
 ) => reservations.some((reservation) =>
-  reservation.reservation_court_id === courtId
-  && toMinutes(reservation.reservation_start_time) < toMinutes(slot.end)
-  && toMinutes(reservation.reservation_end_time) > toMinutes(slot.start));
+  reservation.reservationCourtId === courtId
+  && toMinutes(reservation.reservationStartTime) < toMinutes(slot.end)
+  && toMinutes(reservation.reservationEndTime) > toMinutes(slot.start));
 
 const getAvailableSlots = (
   schedule: ScheduleData,
@@ -158,13 +159,12 @@ export const Reservation = ({ userId = 1 }: ReservationProps) => {
   const saveReservation = async () => {
     if (!selectedCourt || !selectedSlot || !selectedDate) return;
 
-    const reservation: ReservationSaveData = {
-      reservation_date: selectedDate,
-      reservation_start_time: toStoredTime(selectedSlot.start),
-      reservation_end_time: toStoredTime(selectedSlot.end),
-      reservation_court_id: selectedCourt.court.courtId,
-      reservation_user_id: userId,
-      reservation_state: 'ACTIVO',
+    const reservation: typeof reservationDataSave = {
+      reservationDate: selectedDate,
+      reservationStartTime: toStoredTime(selectedSlot.start),
+      reservationEndTime: toStoredTime(selectedSlot.end),
+      reservationCourtId: selectedCourt.court.courtId,
+      reservationUserId: userId,
     };
 
     console.log({ reservation });

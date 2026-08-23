@@ -1,10 +1,10 @@
 import { createContext, useContext, useMemo, type ReactNode } from 'react';
 import { createCourtService, type CourtService } from './courtService';
-import { reservationService } from './reservationService';
+import { createReservationService, type ReservationService } from './reservationService';
 
 type Services = {
   courtService: CourtService;
-  reservationService: typeof reservationService;
+  reservationService: ReservationService;
 };
 
 const ServicesContext = createContext<Services | null>(null);
@@ -17,7 +17,7 @@ type ServicesProviderProps = {
 export const ServicesProvider = ({ token, children }: ServicesProviderProps) => {
   const services = useMemo<Services>(() => ({
     courtService: createCourtService(token),
-    reservationService,
+    reservationService: createReservationService(token),
   }), [token]);
 
   return <ServicesContext.Provider value={services}>{children}</ServicesContext.Provider>;
