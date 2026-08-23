@@ -1,4 +1,4 @@
-import { mockReservations, type reservationDataSave } from '../data/reservation';
+import type { reservationDataSave } from '../data/reservation';
 import type { ReservationData } from '../types/reservation';
 import { createApiClient } from './apiClient';
 
@@ -9,8 +9,10 @@ export const createReservationService = (token: string) => {
   return {
     /** Obtiene las reservas activas que bloquean horarios en una fecha. */
     getOccupiedReservationsByDate: async (date: string): Promise<ReservationData[]> => {
-      return mockReservations.filter((reservation) =>
-        reservation.reservationDate === date && reservation.reservationState === 'ACTIVO');
+      const { data } = await reservationApi.get<ReservationData[]>('reservations/active', {
+        params: { date },
+      });
+      return data;
     },
 
     /** Guarda una reserva mediante el API de reservaciones. */
