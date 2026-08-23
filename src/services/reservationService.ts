@@ -15,6 +15,23 @@ export const createReservationService = (token: string) => {
       return data;
     },
 
+    /** Obtiene las reservas activas pertenecientes a un usuario. */
+    getActiveReservationsByUser: async (userId: number): Promise<ReservationData[]> => {
+      const { data } = await reservationApi.get<ReservationData[]>(`reservations/active/user/${userId}`);
+      return data;
+    },
+
+    /** Obtiene las reservas canceladas pertenecientes a un usuario. */
+    getCancelledReservationsByUser: async (userId: number): Promise<ReservationData[]> => {
+      const { data } = await reservationApi.get<ReservationData[]>(`reservations/canceled/user/${userId}`);
+      return data;
+    },
+
+    /** Cancela una reserva existente. */
+    cancelReservation: async (reservationId: number): Promise<void> => {
+      await reservationApi.patch(`reservations/${reservationId}/cancel`);
+    },
+
     /** Guarda una reserva mediante el API de reservaciones. */
     saveReservation: async (reservation: typeof reservationDataSave): Promise<ReservationData> => {
       const { data } = await reservationApi.post<ReservationData>('reservations', reservation);

@@ -2,6 +2,7 @@ import './App.css';
 import { useState } from 'react';
 import { Alert, Box, Paper, Tab, Tabs, Typography } from '@mui/material';
 import { Reservation } from './components/Reservation';
+import { ReservationManagement } from './components/ReservationManagement';
 import { mockAuth } from './data/mockAuth';
 import type { AuthContext } from './types/auth';
 import { ServicesProvider } from './services/ServicesContext';
@@ -64,13 +65,19 @@ const App = ({ auth }: AppProps) => {
             <Reservation userId={parsedUserId} />
           ) : (
             <Alert severity="error" sx={{ maxWidth: 1180, mx: 'auto', mt: 3 }}>
-              No se puede crear una reserva porque la sesión no contiene un ID de usuario válido.
+              Error al cargar las reservas
             </Alert>
           )}
         </TabPanel>
 
         <TabPanel value={activeTab} index={1}>
-          {/* Espacio reservado para implementar la gestión de reservas. */}
+          {hasValidUserId ? (
+            <ReservationManagement userId={parsedUserId} />
+          ) : (
+            <Alert severity="error" sx={{ maxWidth: 1180, mx: 'auto', mt: 3 }}>
+              Error al cargar las reservas
+            </Alert>
+          )}
         </TabPanel>
       </Paper>
     </ServicesProvider>
