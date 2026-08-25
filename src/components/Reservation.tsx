@@ -175,8 +175,12 @@ export const Reservation = ({ userId }: ReservationProps) => {
       setSuccessMessage('La reserva se guardó correctamente.');
       setSelectedCourt(null);
       setSelectedSlot(null);
-    } catch {
-      setError('No se pudo guardar la reserva. Inténtalo nuevamente.');
+    } catch (saveError) {
+      setError(
+        saveError instanceof Error
+          ? saveError.message
+          : 'No se pudo guardar la reserva. Inténtalo nuevamente.',
+      );
     } finally {
       setIsSaving(false);
     }
