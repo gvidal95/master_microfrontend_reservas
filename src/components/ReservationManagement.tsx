@@ -28,6 +28,7 @@ type ReservationManagementProps = {
 type ReservationTableProps = {
   reservations: ReservationData[];
   emptyMessage: string;
+  finalized?: boolean;
   showCancelAction?: boolean;
   cancellingReservationId?: number | null;
   onCancel?: (reservation: ReservationData) => void;
@@ -36,6 +37,7 @@ type ReservationTableProps = {
 const ReservationTable = ({
   reservations,
   emptyMessage,
+  finalized = false,
   showCancelAction = false,
   cancellingReservationId = null,
   onCancel,
@@ -69,8 +71,14 @@ const ReservationTable = ({
             <TableCell align="center">#{reservation.reservationCourtId}</TableCell>
             <TableCell>
               <Chip
-                label={reservation.reservationState === 'ACTIVO' ? 'Activa' : 'Cancelada'}
-                color={reservation.reservationState === 'ACTIVO' ? 'success' : 'default'}
+                label={
+                  finalized
+                    ? 'Finalizada'
+                    : reservation.reservationState === 'ACTIVO' ? 'Activa' : 'Cancelada'}
+                color={
+                  finalized
+                    ? 'info'
+                    : reservation.reservationState === 'ACTIVO' ? 'success' : 'default'}
                 size="small"
               />
             </TableCell>
@@ -109,6 +117,23 @@ export const ReservationManagement = ({ userId }: ReservationManagementProps) =>
   const [cancelledLoadError, setCancelledLoadError] = useState('');
   const [cancellingReservationId, setCancellingReservationId] = useState<number | null>(null);
   const [cancelError, setCancelError] = useState('');
+
+  const now = new Date();
+
+  const currentDate = [
+    now.getFullYear(),
+    String(now.getMonth() + 1).padStart(2, '0'),
+    String(now.getDate()).padStart(2, '0'),
+  ].join('-');
+
+  console.log({currentDate});
+
+  const finalizedReservations = activeReservations.filter(
+    (reservation) => reservation.reservationDate.slice(0, 10) < currentDate,
+  );
+  const currentActiveReservations = activeReservations.filter(
+    (reservation) => reservation.reservationDate.slice(0, 10) >= currentDate,
+  );
 
   useEffect(() => {
     let isCurrent = true;
@@ -149,7 +174,7 @@ export const ReservationManagement = ({ userId }: ReservationManagementProps) =>
     setCancelError('');
 
     try {
-        
+
       await reservationService.cancelReservation(reservation.reservationId);
       setActiveReservations((current) => current.filter(
         (item) => item.reservationId !== reservation.reservationId,
@@ -182,11 +207,31 @@ export const ReservationManagement = ({ userId }: ReservationManagementProps) =>
             </Paper>
           ) : (
             <ReservationTable
-              reservations={activeReservations}
+              reservations={currentActiveReservations}
               emptyMessage="No hay reservas activas."
               showCancelAction
               cancellingReservationId={cancellingReservationId}
               onCancel={cancelReservation}
+            />
+          )}
+        </Box>
+
+        <Box>
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="h5" sx={{ fontWeight: 700 }}>Reservas finalizadas</Typography>
+          </Box>
+          {loadError && <Alert severity="error" sx={{ mb: 2 }}>{loadError}</Alert>}
+          {isLoading ? (
+            <Paper variant="outlined">
+              <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+                <CircularProgress />
+              </Box>
+            </Paper>
+          ) : (
+            <ReservationTable
+              reservations={finalizedReservations}
+              emptyMessage="No hay reservas finalizadas."
+              finalized
             />
           )}
         </Box>
