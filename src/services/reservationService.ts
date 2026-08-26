@@ -1,6 +1,26 @@
 import type { reservationDataSave } from '../data/reservation';
 import type { ReservationData } from '../types/reservation';
+import axios from 'axios';
 import { createApiClient } from './apiClient';
+
+const getReservationErrorMessage = (error: unknown) => {
+  if (!axios.isAxiosError(error)) return undefined;
+
+  const responseData: unknown = error.response?.data;
+  if (typeof responseData === 'string' && responseData.trim()) return responseData;
+
+  if (
+    responseData
+    && typeof responseData === 'object'
+    && 'message' in responseData
+    && typeof responseData.message === 'string'
+    && responseData.message.trim()
+  ) {
+    return responseData.message;
+  }
+
+  return undefined;
+};
 
 /** Servicio de reservas con almacenamiento mock y una interfaz compatible con HTTP. */
 export const createReservationService = (token: string) => {
@@ -34,8 +54,15 @@ export const createReservationService = (token: string) => {
 
     /** Guarda una reserva mediante el API de reservaciones. */
     saveReservation: async (reservation: typeof reservationDataSave): Promise<ReservationData> => {
-      const { data } = await reservationApi.post<ReservationData>('reservations', reservation);
-      return data;
+      try {
+        const { data } = await reservationApi.post<ReservationData>('reservations', reservation);
+        return data;
+      } catch (error) {
+        throw new Error(
+          getReservationErrorMessage(error)
+          ?? 'No se pudo guardar la reserva. Inténtalo nuevamente.',
+        );
+      }
     },
   };
 };
